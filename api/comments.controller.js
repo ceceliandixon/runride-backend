@@ -57,7 +57,7 @@ export default class commentsController {
             }
 
             if (commentResponse.modifiedCount == 0) {
-                throw new Error ("Unable to update .")
+                throw new Error ("Unable to update comment.")
             }
             res.json({ status: "success " });
         } catch(e) {

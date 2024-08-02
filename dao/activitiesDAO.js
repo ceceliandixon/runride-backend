@@ -16,7 +16,7 @@ export default class activitiesDAO {
                 process.env.RUNRIDE_COLLECTION)
                 .collection('activities');
         } catch (e) {
-            console.error(`Unable to connect to moviesDAO: ${e}`);
+            console.error(`Unable to connect to activitiesDAO: ${e}`);
         }
     }
 
@@ -31,9 +31,9 @@ export default class activitiesDAO {
                 date: date
                 // activity_id: new ObjectId(activityId),
             }
-            return await reviews.insertOne(reviewDoc);
+            return await activities.insertOne(activityDoc);
         } catch(e) {
-            console.error(`Unable to post review: ${e}`);
+            console.error(`Unable to post activity: ${e}`);
             return { error: e};
         }
     }
@@ -46,7 +46,7 @@ export default class activitiesDAO {
             );
             return updateResponse;
         } catch (e) {
-            console.error(`Unable to update review: ${e}`);
+            console.error(`Unable to update activity: ${e}`);
             return { error: e };
         }
     }
@@ -60,7 +60,7 @@ export default class activitiesDAO {
             });
         return deleteResponse;
         } catch (e) {
-            console.error(`Unable to delete review: ${e}`);
+            console.error(`Unable to delete activity: ${e}`);
             return { error: e };
         }
     }
