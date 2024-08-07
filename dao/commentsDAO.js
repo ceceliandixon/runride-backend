@@ -49,7 +49,7 @@ export default class commentsDAO {
 
     static async deleteComment(commentId, userId) {
         try {
-            const deleteComment = await comment.deleteOne({
+            const deleteComment = await comments.deleteOne({
                  _id: new ObjectId(commentId),
                   user_id: userId,
             });

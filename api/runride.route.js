@@ -1,6 +1,7 @@
 import express from 'express';
 import activitiesController from './activities.controller.js';
 import commentsController from './comments.controller.js';
+import usersController from './users.controller.js';
 
 const router = express.Router(); // get access to express router
 
@@ -19,5 +20,11 @@ router
     .post(commentsController.apiPostComment)
     .put(commentsController.apiUpdateComment)
     .delete(commentsController.apiDeleteComment);
+
+router.route("/users")
+    .post(usersController.apiCreateUser)
+    .put(usersController.apiUpdateFriends);
+
+router.route("/users/:userId").get(usersController.apiGetFriends);
 
 export default router;

@@ -13,7 +13,7 @@ export default class commentsController {
 
             const date = new Date();
 
-            const commentResponse = await commentsDAO.addComment(
+            const userResponse = await commentsDAO.addComment(
                 activityId,
                 userInfo,
                 comment,
