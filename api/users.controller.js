@@ -51,6 +51,23 @@ export default class usersController {
         }
     }
 
+    static async apiGetUser(req, res, next) {
+        try {
+            let id = req.params.userId;
+            let user = await usersDAO.getUser(id);
+
+            if (!user) {
+                res.status(404).json({ error: "User not found" });
+                return;
+            }
+
+            res.json(user);
+        } catch (e) {
+            console.error(`API, ${e}`);
+            res.status(500).json({ error: e.message });
+        }
+    }
+
 
     static async apiGetFriends(req, res, next) {
         try {

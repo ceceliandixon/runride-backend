@@ -25,6 +25,8 @@ router.route("/users")
     .post(usersController.apiCreateUser)
     .put(usersController.apiUpdateFriends);
 
-router.route("/users/:userId").get(usersController.apiGetFriends);
+router.route("/users/:userId/friends").get(usersController.apiGetFriends);
+
+router.route("/users/:userId").get(usersController.apiGetUser);
 
 export default router;

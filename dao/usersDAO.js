@@ -44,6 +44,19 @@ export default class usersDAO {
     }
   }
 
+  static async getUser(id) {
+    try {
+        const user = await users.findOne({ userId: id });
+        if (!user) {
+            throw new Error(`User with ID ${id} not found`);
+        }
+        return user;
+    } catch (e) {
+        console.error(`Something went wrong in getUser: ${e}`);
+        throw e;
+    }
+  }
+
   static async getFriends(id) {
     let cursor;
     try {
