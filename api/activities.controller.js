@@ -30,21 +30,18 @@ export default class activitiesController {
 
     static async apiPostActivity(req, res, next) {
         try {
-            const activityType = req.body.activityType;
-            const text = req.body.text;
-            const distance = req.body.distance;
-            const userInfo = {
-                name: req.body.name,
-                _id: req.body.user_id,
-            }
-
+            const { userName, userId, description, distance, activityType, picture, picturePath } = req.body;
+        
             const date = new Date();
 
             const activityResponse = await activitiesDAO.addActivity(
-                activityType,
-                userInfo,
-                text,
+                userName,
+                userId,
+                description,
                 distance,
+                activityType,
+                picture || null,        // Handle picture if provided
+                picturePath || null,    // Handle picturePath if provided
                 date
             );
 

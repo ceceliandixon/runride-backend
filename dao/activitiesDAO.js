@@ -20,21 +20,24 @@ export default class activitiesDAO {
         }
     }
 
-    static async addActivity(activityType, user, text, distance, date) {
+    
+    static async addActivity(userName, userId, description, distance, activityType, picture = null, picturePath = null, date) {
         try {
             const activityDoc = {
-                name: user.name,
-                user_id: user._id,
-                activityType: activityType,
-                text: text,
+                userName: userName,
+                userId: userId,
+                description: description,
                 distance: distance,
+                activityType: activityType,
+                picture: picture || null,       // Default to null if picture is not provided
+                picturePath: picturePath || null, // Default to null if picturePath is not provided
                 date: date
-                // activity_id: new ObjectId(activityId),
-            }
+            };
+    
             return await activities.insertOne(activityDoc);
-        } catch(e) {
+        } catch (e) {
             console.error(`Unable to post activity: ${e}`);
-            return { error: e};
+            return { error: e };
         }
     }
 
