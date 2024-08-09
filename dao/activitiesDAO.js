@@ -68,31 +68,15 @@ export default class activitiesDAO {
         }
     }
 
-    static async getActivities({
-        filters = null,
-        page = 0,
-        activitiesPerPage = 20,
-    } = {}) {
-        let query;
-        if (filters) {
-            if ('title' in filters) {
-                query = { $text: { $search: filters['title'] } };
-            } else if ('rated' in filters) {
-                query = { 'rated': { $eq: filters['rated'] } };
-            }
-        }
-
-        let cursor;
+    static async getActivities() {
         try {
-            cursor = await activities.find(query)
-                                .limit(activitiesPerPage)
-                                .skip(activitiesPerPage * page);
-            const activitiesList = await cursor.toArray();
-            const totalNumActivities = await activities.countDocuments(query);
-            return { activitiesList, totalNumActivities };
+            // Fetch all activities from the database
+            const cursor = await activities.find({}).toArray(); // No filters or pagination
+            const totalNumActivities = cursor.length; // Count the number of activities
+            return { activitiesList: cursor, totalNumActivities };
         } catch (e) {
             console.error(`Unable to issue find command, ${e}`);
-            return { activitiesList:[], totalNumActivities: 0 };
+            return { activitiesList: [], totalNumActivities: 0 };
         }
     }
 
@@ -118,6 +102,18 @@ export default class activitiesDAO {
         } catch (e) {
             console.error(`Unable to get activity by ID: ${e}`);
             throw e;
+        }
+    }
+
+    static async getActivitiesByUserId(userId) {
+        let query = { userId: userId }; // Use userId to filter activities
+        try {
+            const cursor = await activities.find(query);
+            const activitiesList = await cursor.toArray();
+            return activitiesList;
+        } catch (e) {
+            console.error(`Unable to fetch activities by user ID, ${e}`);
+            return [];
         }
     }
 }

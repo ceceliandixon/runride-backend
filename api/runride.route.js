@@ -12,8 +12,13 @@ router
     .put(activitiesController.apiUpdateActivity)
     .delete(activitiesController.apiDeleteActivity);
 
-router.route('/id/:id').get(activitiesController.apiGetActivityById);
+    router.route('/activities/user/:userId').get(activitiesController.apiGetActivitiesByUserId)
+
+//
+
+router.route('/activity/:id').get(activitiesController.apiGetActivityById);
 // other methods associated with activities add here (athletes/participants maybe)
+
 
 router
     .route('/comment')

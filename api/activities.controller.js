@@ -3,29 +3,13 @@ import activitiesDAO from "../dao/activitiesDAO.js";
 export default class activitiesController {
 
     static async apiGetActivities(req, res, next) {
-        // TODO: how many p page? filtering?
-        const activitiesPerPage = req.query.activitiesPerPage ?
-            parseInt(req.query.activitiesPerPage) : 20;
-        const page = req.query.page ? parseInt(req.query.page) : 0;
-
-        let filters = {}
-        if (req.query.rated) {
-            filters.rated = req.query.rated;
-        } else if (req.query.title) {
-            filters.title = req.query.title;
+        try {
+            const { activitiesList, totalNumActivities } = await activitiesDAO.getActivities();
+            res.json({ activities: activitiesList, totalResults: totalNumActivities });
+        } catch (error) {
+            console.error('Error fetching activities:', error);
+            next(error);
         }
-
-        const { activitiesList, totalNumActivities } = await
-            activitiesDAO.getActivities({ page, activitiesPerPage }); // add filtering functionality
-
-        let response = {
-            activities: activitiesList,
-            page: page,
-            filters: filters,
-            entries_per_page: activitiesPerPage,
-            totalResults: totalNumActivities,
-        };
-        res.json(response);
     }
 
     static async apiPostActivity(req, res, next) {
@@ -124,6 +108,29 @@ export default class activitiesController {
             res.status(500).json({ error:e });
         }
     }
+
+    static async apiGetActivitiesByUserId(req, res, next) {
+        try {
+            const { userId } = req.params; // Extract userId from the request parameters
+            if (!userId) {
+                res.status(400).json({ error: 'User ID is required' });
+                return;
+            }
+    
+            const activities = await activitiesDAO.getActivitiesByUserId(userId); // Fetch activities by user ID
+            if (!activities || activities.length === 0) {
+                res.status(404).json({ error: 'No activities found for this user' });
+                return;
+            }
+    
+            res.json(activities);
+        } catch (e) {
+            console.error(`API Error: ${e}`);
+            res.status(500).json({ error: e.message });
+        }
+    }
+
+
 
     // add other api methods here as needed
 }
