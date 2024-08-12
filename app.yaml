@@ -1,5 +1,0 @@
-runtime: nodejs18
-
-env_variables:
-  RUNRIDE_DB_URI: "mongodb+srv://atlas_db_user:atlas_db_user_123@cluster0.x59bk.mongodb.net/ride_run_db?retryWrites=true&w=majority"
-  RUNRIDE_COLLECTION: "ride_run_db"

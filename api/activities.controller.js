@@ -1,7 +1,6 @@
 import activitiesDAO from "../dao/activitiesDAO.js";
 
 export default class activitiesController {
-
     static async apiGetActivities(req, res, next) {
         try {
             const { activitiesList, totalNumActivities } = await activitiesDAO.getActivities();
@@ -14,8 +13,9 @@ export default class activitiesController {
 
     static async apiPostActivity(req, res, next) {
         try {
-            const { userName, userId, description, distance, activityType, picture, picturePath } = req.body;
-        
+            const { userName, userId, description, distance, activityType } = req.body;
+            const picturePath = req.file ? `/assets/${req.file.filename}` : null; // Handle picturePath if an image was uploaded
+
             const date = new Date();
 
             const activityResponse = await activitiesDAO.addActivity(
@@ -24,8 +24,7 @@ export default class activitiesController {
                 description,
                 distance,
                 activityType,
-                picture || null,        // Handle picture if provided
-                picturePath || null,    // Handle picturePath if provided
+                picturePath,    // Handle picturePath
                 date
             );
 
@@ -40,13 +39,11 @@ export default class activitiesController {
                 });
             }
         } catch (e) {
-            res.status(500).json({ error: e});
+            res.status(500).json({ error: e.message });
         }
     }
 
-    
     static async apiUpdateActivity(req, res, next) {
-        
         try {
             const activityId = req.body.activity_id;
             const text = req.body.text;
@@ -58,19 +55,19 @@ export default class activitiesController {
                 req.body.user_id,
                 text,
                 date
-            )
+            );
 
-            var { error } = activityResponse
+            var { error } = activityResponse;
             if (error) {
                 res.status(500).json({ error });
             }
 
             if (activityResponse.modifiedCount == 0) {
-                throw new Error ("Unable to update activity.")
+                throw new Error("Unable to update activity.");
             }
             res.json({ status: "success " });
-        } catch(e) {
-            res.status(500).json({ error: e.message })
+        } catch (e) {
+            res.status(500).json({ error: e.message });
         }
     }
 
@@ -89,23 +86,23 @@ export default class activitiesController {
             } else {
                 res.json({ status: "success" });
             }
-        } catch(e) {
+        } catch (e) {
             res.status(500).json({ error: e.message });
         }
     }
 
     static async apiGetActivityById(req, res, next) {
         try {
-            let id = req.params.id || {}
+            let id = req.params.id || {};
             let activity = await activitiesDAO.getActivityById(id);
             if (!activity) {
                 res.status(404).json({ error: "not found" });
                 return;
             }
             res.json(activity);
-        } catch(e) {
+        } catch (e) {
             console.log(`API, ${e}`);
-            res.status(500).json({ error:e });
+            res.status(500).json({ error: e.message });
         }
     }
 
@@ -116,21 +113,19 @@ export default class activitiesController {
                 res.status(400).json({ error: 'User ID is required' });
                 return;
             }
-    
+
             const activities = await activitiesDAO.getActivitiesByUserId(userId); // Fetch activities by user ID
             if (!activities || activities.length === 0) {
                 res.status(404).json({ error: 'No activities found for this user' });
                 return;
             }
-    
+
             res.json(activities);
         } catch (e) {
             console.error(`API Error: ${e}`);
             res.status(500).json({ error: e.message });
         }
     }
-
-
 
     // add other api methods here as needed
 }

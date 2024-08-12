@@ -1,37 +1,52 @@
 import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import activitiesController from './activities.controller.js';
 import commentsController from './comments.controller.js';
 import usersController from './users.controller.js';
 
-const router = express.Router(); // get access to express router
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+const router = express.Router();
+
+// Multer setup for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../public/assets')); // Folder where files will be saved
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname); // Use the original filename
+  },
+});
+const upload = multer({ storage });
+
+// Routes for activities
 router
-    .route('/')
-    .get(activitiesController.apiGetActivities)
-    .post(activitiesController.apiPostActivity)
-    .put(activitiesController.apiUpdateActivity)
-    .delete(activitiesController.apiDeleteActivity);
+  .route('/')
+  .get(activitiesController.apiGetActivities)
+  .post(upload.single('picture'), activitiesController.apiPostActivity) // Apply multer here
+  .put(activitiesController.apiUpdateActivity)
+  .delete(activitiesController.apiDeleteActivity);
 
-    router.route('/activities/user/:userId').get(activitiesController.apiGetActivitiesByUserId)
-
-//
+router.route('/activities/user/:userId').get(activitiesController.apiGetActivitiesByUserId);
 
 router.route('/activity/:id').get(activitiesController.apiGetActivityById);
-// other methods associated with activities add here (athletes/participants maybe)
 
-
+// Routes for comments
 router
-    .route('/comment')
-    .post(commentsController.apiPostComment)
-    .put(commentsController.apiUpdateComment)
-    .delete(commentsController.apiDeleteComment);
+  .route('/comment')
+  .post(commentsController.apiPostComment)
+  .put(commentsController.apiUpdateComment)
+  .delete(commentsController.apiDeleteComment);
 
-router.route("/users")
-    .post(usersController.apiCreateUser)
-    .put(usersController.apiUpdateFriends);
+// Routes for users
+router
+  .route('/users')
+  .post(usersController.apiCreateUser)
+  .put(usersController.apiUpdateFriends);
 
-//router.route("/users/:userId/friends").get(usersController.apiGetFriends);
-
-router.route("/users/:userId").get(usersController.apiGetUser);
+router.route('/users/:userId').get(usersController.apiGetUser);
 
 export default router;
