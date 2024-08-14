@@ -13,32 +13,54 @@ export default class activitiesController {
 
     static async apiPostActivity(req, res, next) {
         try {
-            const { userName, userId, description, distance, activityType } = req.body;
-            const picturePath = req.file ? `/assets/${req.file.filename}` : null; // Handle picturePath if an image was uploaded
-
+            const { userName, userId, description, distance, activityType, picture, picturePath } = req.body;
+            const likesList = Array.isArray(req.body.likesList) ? req.body.likesList : [];
+        
             const date = new Date();
-
             const activityResponse = await activitiesDAO.addActivity(
                 userName,
                 userId,
                 description,
                 distance,
                 activityType,
-                picturePath,    // Handle picturePath
+                picture || null,        // Handle picture if provided
+                picturePath || null,    // Handle picturePath if provided
+                likesList,
                 date
             );
-
             var { error } = activityResponse;
-
             if (error) {
                 res.status(500).json({ error: "Unable to post activity." });
             } else {
-                res.json({
-                    status: "success",
-                    response: activityResponse
-                });
+                res.json({ status: "success" });
             }
+        } catch(e) {
+            res.status(500).json({ error: e.message });
+        }
+    }
+
+    static async apiAddLike(req, res, next) {
+        try {
+            const activityId = req.params.id; // Extract activityId from route parameters
+            const userId = req.body.user_id; // Extract userId from request body
+    
+            console.log('Activity ID:', activityId); // Debugging
+            console.log('User ID:', userId); // Debugging
+    
+            const activityResponse = await activitiesDAO.addLike(activityId, userId);
+    
+            const { error } = activityResponse;
+            if (error) {
+                return res.status(500).json({ error });
+            }
+    
+            if (activityResponse.modifiedCount === 0) {
+                throw new Error("Unable to update activity. It might not exist or the user might already be in the likes array.");
+            }
+    
+            res.json({ status: "success" });
         } catch (e) {
+            console.error('Error in apiAddLike:', e.message); // Debugging
             res.status(500).json({ error: e.message });
         }
     }

@@ -34,6 +34,9 @@ router.route('/activities/user/:userId').get(activitiesController.apiGetActiviti
 
 router.route('/activity/:id').get(activitiesController.apiGetActivityById);
 
+router.route('/activities/:id/like')
+    .patch(activitiesController.apiAddLike);
+
 // Routes for comments
 router
   .route('/comment')

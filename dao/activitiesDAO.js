@@ -21,7 +21,7 @@ export default class activitiesDAO {
     }
 
     
-    static async addActivity(userName, userId, description, distance, activityType, picture = null, picturePath = null, date) {
+    static async addActivity(userName, userId, description, distance, activityType, picture = null, picturePath = null, likesList, date) {
         try {
             const activityDoc = {
                 userName: userName,
@@ -31,6 +31,7 @@ export default class activitiesDAO {
                 activityType: activityType,
                 picture: picture || null,       // Default to null if picture is not provided
                 picturePath: picturePath || null, // Default to null if picturePath is not provided
+                likesList: likesList,
                 date: date
             };
     
@@ -40,6 +41,8 @@ export default class activitiesDAO {
             return { error: e };
         }
     }
+
+    
 
     static async updateActivity(activityId, userId, text, date) {
         try {
@@ -55,16 +58,21 @@ export default class activitiesDAO {
     }
 
 
-    static async deleteActivity(activityId, userId) {
+    static async addLike(activityId, userId) {
         try {
-            const deleteResponse = await activities.deleteOne({
-                 _id: new ObjectId(activityId),
-                  user_id: userId,
-            });
-        return deleteResponse;
+            const updateResponse = await activities.updateOne(
+                { _id: new ObjectId(activityId) },
+                { $addToSet: { likesList: userId } } // Use $addToSet to add userId to the likes array
+            );
+    
+            if (updateResponse.matchedCount === 0) {
+                throw new Error('No activity found with the provided ID.');
+            }
+    
+            return { status: 'success', matchedCount: updateResponse.matchedCount, modifiedCount: updateResponse.modifiedCount };
         } catch (e) {
-            console.error(`Unable to delete activity: ${e}`);
-            return { error: e };
+            console.error(`Unable to add like: ${e.message}`); // Debugging
+            return { error: e.message };
         }
     }
 
